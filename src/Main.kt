@@ -1,74 +1,48 @@
-import java.util.*
+import kotlin.system.exitProcess
 
 fun main() {
-    var isPlayAgain: Boolean
-    val gameOptions = arrayOf("Rock", "Paper", "Scissors")
+    val maxNum = 100
+    val minNum = 0
+    val luckyNumber = (Math.random() * maxNum).toInt() + minNum
+    var userGuess: Int?
+    var numGuesses = 5
 
     do {
-        val userChoice = getUserChoice(gameOptions)
-        val gameChoice = getGameChoice(gameOptions)
-
-        println("You chose $userChoice, I chose $gameChoice")
-        val userWin = (userChoice == "Rock" && gameChoice == "Scissors") ||
-                (userChoice == "Paper" && gameChoice == "Rock") ||
-                (userChoice == "Scissors" && gameChoice == "Paper")
-        val isDraw = userChoice == gameChoice
-
-        if (userWin) {
-            println("You win!")
-        } else if (isDraw) {
-            println("Draw")
-        } else {
-            println("I win!")
+        if (numGuesses == 0) {
+            println("no more guesses left. You lose :(")
+            break
         }
 
-        isPlayAgain = askToPlayAgain()
-    } while (isPlayAgain)
-
-    println("Exiting program... Bye :)")
-}
-
-fun askToPlayAgain(): Boolean {
-    var userChoice = ""
-    val validChoices = arrayOf("y", "n")
-
-    while (userChoice !in validChoices) {
-        println("Do you wish to play again? y/n")
-        userChoice = (readlnOrNull() ?: "").lowercase()
-
-        if (userChoice !in validChoices) println("Invalid option selected, please select either y/n")
-    }
-    println()
-    return userChoice == "y"
-}
-
-fun getUserChoice(gameOptions: Array<String>): String {
-    println("Select one of the following: ")
-    for ((index, option) in gameOptions.withIndex()) {
-        println("$index) $option")
-    }
-
-    var userChoice = ""
-    while(userChoice !in gameOptions) {
-        val userInput: String = readlnOrNull() ?: ""
-
-        if (userInput.toIntOrNull() != null) {
-            // user selected gameOption by index
-            val selectedIndex = userInput.toInt()
-            if (selectedIndex >=0 && selectedIndex < gameOptions.size) {
-                userChoice = gameOptions[selectedIndex]
-            }
-        } else {
-            // user selected gameOption by string
-            userChoice = userInput.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+        println("Guess the lucky number between $minNum and $maxNum")
+        val userInput = readlnOrNull()
+        if (userInput == null) {
+            println("you chose not to play. Goodbye :/")
+            exitProcess(1)
         }
 
-        if(userChoice !in gameOptions) println("Invalid option selected $userInput")
-    }
-    return userChoice
-}
+        // validate userInput is an integer
+        userGuess = userInput.toIntOrNull()
+        if (userGuess == null) {
+            println("please select a number between $minNum and $maxNum")
+            continue
+        }
 
-fun getGameChoice(gameOptions: Array<String>): String {
-    val randomIndex: Int = (Math.random() * gameOptions.size).toInt()
-    return gameOptions[randomIndex]
+        // validate user's guess is between minNum and maxNum
+        if (userGuess < minNum || userGuess > maxNum) {
+            println("please select a number between $minNum and $maxNum")
+            continue
+        }
+
+        // hot or cold
+        if (userGuess > luckyNumber) {
+            println("too high")
+        } else if (userGuess < luckyNumber) {
+            println("too low")
+        } else {
+            println("you are right. the lucky number is indeed $luckyNumber")
+        }
+
+        numGuesses--
+        println("$numGuesses guesses left!")
+    } while (userGuess != luckyNumber)
 }
