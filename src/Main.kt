@@ -1,6 +1,6 @@
-fun enterNumber(min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE): Int {
-    var number: Int? = null
-    val prompt: String = if (min == Int.MIN_VALUE || max == Int.MAX_VALUE) {
+fun enterNumber(min: Double = Double.MIN_VALUE, max: Double = Double.MAX_VALUE): Double {
+    var number: Double? = null
+    val prompt = if (min == Double.MIN_VALUE && max == Double.MAX_VALUE) {
         "Enter a number: "
     } else {
         "Enter a number between $min and $max: "
@@ -10,7 +10,7 @@ fun enterNumber(min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE): Int {
         print(prompt)
         val input: String = readlnOrNull() ?: continue
 
-        number = input.toIntOrNull()
+        number = input.toDoubleOrNull()
         if (number == null) {
             println("input is not a valid integer\n")
             continue
@@ -26,22 +26,26 @@ fun enterNumber(min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE): Int {
     return number
 }
 
-fun sum(vararg numbers: Int): Int {
-//    val total = numbers.fold(0) { acc, i -> acc + i}
-    var total = 0
+fun <T : Number> sum(vararg numbers: T): T {
+//    val total = numbers.fold(0) { acc, i -> acc + i }
+    var total = 0.0
     for (number in numbers) {
-        total += number
+        total += number.toDouble()
     }
-    return total
+    return total as T
 }
 
-fun multiply(vararg numbers: Int): Int {
-//    val result = numbers.fold(1) { acc, i -> acc * i}
-    var result = 1
-    for (number in numbers) {
-        result *= number
+fun <T : Number> multiply(vararg numbers: T): T {
+    if (numbers.isEmpty()) {
+        return 0.0 as T
     }
-    return result
+
+//    val result = numbers.fold(1) { acc, i -> acc * i}
+    var result = 1.0
+    for (number in numbers) {
+        result *= number.toDouble()
+    }
+    return result as T
 }
 
 fun divide(numOne: Double, numTwo: Double): Double? {
@@ -55,9 +59,12 @@ fun divide(numOne: Double, numTwo: Double): Double? {
 
 fun main() {
     val numberOne = enterNumber()
-    val numberTwo = enterNumber(0, 10)
+    val numberTwo = enterNumber(0.0, 10.0)
 
-    println("$numberOne + $numberTwo = ${sum(numberOne, numberTwo)}")
-    println("$numberOne * $numberTwo = ${multiply(numberOne, numberTwo)}")
-    println("$numberOne / $numberTwo = ${divide(numberOne.toDouble(), numberTwo.toDouble()) ?: "undefined"}")
+    println("%.4f + %.4f = %.4f".format(numberOne, numberTwo, sum(numberOne, numberTwo)))
+    println("%.4f * %.4f = %.4f".format(numberOne, numberTwo, multiply(numberOne, numberTwo)))
+
+    val divideResult = divide(numberOne, numberTwo)
+    print("%.4f / %.4f = ".format(numberOne, numberTwo))
+    if (divideResult == null) print("undefined") else print("%.4f".format(divideResult))
 }
