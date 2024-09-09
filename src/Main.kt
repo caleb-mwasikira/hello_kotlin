@@ -1,44 +1,62 @@
-import kotlin.system.exitProcess
-
-class Person(
-    val name: String,
-    age: Int,
-    hobby: String?=null,
-    val referrer: Person?=null
-) {
-    var age: Int = age
-        set(value) {
-            if (value in 0..100) {
-                field = value
-            } else {
-                // preferably throw an IllegalArgumentException
-                println("invalid age argument: valid age must be between 0 and 100")
-                exitProcess(1)
-            }
-        }
-    var hobby: String? = hobby
+open class Phone(
+    deviceName: String = "Unknown",
+    var isLightOn: Boolean = false
+){
+    val deviceName: String = deviceName
         get() {
-            return if (field == null) "Doesn't have a hobby" else "Likes to $field"
+            return field.lowercase()
         }
 
-    fun showProfile() {
-        val referrerMessage: String = if (referrer == null) {
-            "Doesn't have a referrer"
+    open fun switchOn() {
+        isLightOn = true
+    }
+
+    fun switchOff() {
+        isLightOn = false
+    }
+
+    fun checkStatus() {
+        val onOrOff: String = if (isLightOn) "on" else "off"
+        println("device ($deviceName): The phone screen's light is $onOrOff")
+    }
+}
+
+class FoldablePhone(
+    deviceName: String = "Unknown",
+    var isFolded: Boolean = true
+) : Phone(
+    deviceName=deviceName,
+    isLightOn=!isFolded
+) {
+    override fun switchOn() {
+        if (!isFolded) {
+            isLightOn = true
         } else {
-            "Has a referrer named ${referrer.name}, who ${referrer.hobby?.lowercase()}"
+            println("device ($deviceName): cannot switch on screen while phone is folded")
         }
+    }
 
-        println("Name: $name\n" +
-                "Age: $age\n" +
-                "Hobby: $hobby. $referrerMessage\n\n"
-        )
+    fun fold() {
+        isFolded = true
+    }
+
+    fun unfold() {
+        isFolded = false
     }
 }
 
 fun main() {
-    val amanda = Person(name="Amanda", age=33, hobby="play tennis", referrer=null)
-    val atiqah = Person(name="Atiqah", age=28, hobby="climb", referrer=amanda)
+    val amandasPhone = Phone(deviceName="Amanda", isLightOn=false)
+    amandasPhone.switchOn()
+    amandasPhone.checkStatus()
+    println()
 
-    amanda.showProfile()
-    atiqah.showProfile()
+    val lindasPhone = FoldablePhone(deviceName="Linda", isFolded=true)
+    lindasPhone.fold()
+    lindasPhone.switchOn()
+    lindasPhone.checkStatus()
+
+    lindasPhone.unfold()
+    lindasPhone.switchOn()
+    lindasPhone.checkStatus()
 }
